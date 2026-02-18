@@ -1,100 +1,15 @@
 import { useState } from "react";
 import { MapPin, Clock, DollarSign, Bookmark, Star } from "lucide-react";
+import { Link } from "react-router-dom";
+import { JOBS } from "@/data/jobs";
 
 const FILTERS = ["All Jobs", "Full-time", "Part-time", "Remote", "Contract", "Internship"];
 
-const JOBS = [
-  {
-    id: 1,
-    title: "Senior Software Engineer",
-    company: "Google",
-    logo: "G",
-    logoColor: "#4285F4",
-    location: "Mountain View, CA",
-    salary: "$180K – $240K",
-    type: "Full-time",
-    posted: "2h ago",
-    tags: ["React", "Node.js", "TypeScript"],
-    featured: true,
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    title: "Product Manager",
-    company: "Microsoft",
-    logo: "M",
-    logoColor: "#00A4EF",
-    location: "Seattle, WA",
-    salary: "$150K – $200K",
-    type: "Full-time",
-    posted: "5h ago",
-    tags: ["Agile", "Roadmap", "B2B"],
-    featured: false,
-    rating: 4.6,
-  },
-  {
-    id: 3,
-    title: "UX Design Lead",
-    company: "Apple",
-    logo: "A",
-    logoColor: "#555",
-    location: "Cupertino, CA",
-    salary: "$160K – $210K",
-    type: "Full-time",
-    posted: "1d ago",
-    tags: ["Figma", "User Research", "Design Systems"],
-    featured: true,
-    rating: 4.9,
-  },
-  {
-    id: 4,
-    title: "Data Scientist",
-    company: "Netflix",
-    logo: "N",
-    logoColor: "#E50914",
-    location: "Remote",
-    salary: "$140K – $190K",
-    type: "Remote",
-    posted: "1d ago",
-    tags: ["Python", "ML", "SQL"],
-    featured: false,
-    rating: 4.5,
-  },
-  {
-    id: 5,
-    title: "DevOps Engineer",
-    company: "Amazon",
-    logo: "A",
-    logoColor: "#FF9900",
-    location: "Austin, TX",
-    salary: "$130K – $175K",
-    type: "Full-time",
-    posted: "2d ago",
-    tags: ["AWS", "Kubernetes", "Terraform"],
-    featured: false,
-    rating: 4.3,
-  },
-  {
-    id: 6,
-    title: "Marketing Director",
-    company: "Salesforce",
-    logo: "S",
-    logoColor: "#00A1E0",
-    location: "San Francisco, CA",
-    salary: "$145K – $185K",
-    type: "Full-time",
-    posted: "3d ago",
-    tags: ["B2B", "SaaS", "Demand Gen"],
-    featured: false,
-    rating: 4.4,
-  },
-];
-
 const typeColor: Record<string, string> = {
   "Full-time": "job-tag-navy",
-  "Remote": "job-tag",
+  "Remote":    "job-tag",
   "Part-time": "job-tag-orange",
-  "Contract": "job-tag-orange",
+  "Contract":  "job-tag-orange",
 };
 
 const JobListings = () => {
@@ -143,7 +58,10 @@ const JobListings = () => {
         {/* Job Cards Grid */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((job) => (
-            <div key={job.id} className={`job-card relative flex flex-col gap-4 ${job.featured ? "ring-1 ring-accent/30" : ""}`}>
+            <div
+              key={job.id}
+              className={`job-card relative flex flex-col gap-4 ${job.featured ? "ring-1 ring-accent/30" : ""}`}
+            >
               {/* Featured badge */}
               {job.featured && (
                 <span className="absolute -top-2.5 right-4 rounded-full bg-accent px-3 py-0.5 text-xs font-semibold text-accent-foreground">
@@ -171,9 +89,7 @@ const JobListings = () => {
                 <button
                   onClick={() => toggleSave(job.id)}
                   className={`rounded-lg p-2 transition-all ${
-                    saved.includes(job.id)
-                      ? "text-accent"
-                      : "text-muted-foreground hover:text-accent"
+                    saved.includes(job.id) ? "text-accent" : "text-muted-foreground hover:text-accent"
                   }`}
                 >
                   <Bookmark className={`h-5 w-5 ${saved.includes(job.id) ? "fill-accent" : ""}`} />
@@ -181,9 +97,11 @@ const JobListings = () => {
               </div>
 
               {/* Title */}
-              <div>
-                <h3 className="font-display text-lg font-700 text-foreground leading-snug">{job.title}</h3>
-              </div>
+              <Link to={`/jobs/${job.id}`} className="group">
+                <h3 className="font-display text-lg font-700 text-foreground leading-snug group-hover:text-accent transition-colors">
+                  {job.title}
+                </h3>
+              </Link>
 
               {/* Meta */}
               <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
@@ -208,7 +126,9 @@ const JobListings = () => {
                 <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <Clock className="h-3.5 w-3.5" /> {job.posted}
                 </span>
-                <button className="btn-cta px-4 py-2 text-xs">Apply Now</button>
+                <Link to={`/jobs/${job.id}`} className="btn-cta px-4 py-2 text-xs">
+                  Apply Now
+                </Link>
               </div>
             </div>
           ))}
