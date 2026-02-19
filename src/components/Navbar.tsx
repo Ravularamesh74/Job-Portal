@@ -1,73 +1,142 @@
-import { useState } from "react";
-import { Search, MapPin, Briefcase, Menu, X, Bell, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import {
+  Briefcase,
+  Bell,
+  Menu,
+  X,
+  Search,
+  User,
+  ChevronDown,
+} from "lucide-react";
+import { motion } from "framer-motion";
 
-const Navbar = () => {
+export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  // Scroll shadow effect
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-primary/95 backdrop-blur-md">
-      <div className="container mx-auto flex h-16 items-center justify-between">
+    <motion.header
+      initial={{ y: -80 }}
+      animate={{ y: 0 }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all ${
+        scrolled
+          ? "bg-black/80 backdrop-blur-xl shadow-lg border-b border-white/10"
+          : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
-            <Briefcase className="h-5 w-5 text-accent-foreground" />
+        <div className="flex items-center gap-2 cursor-pointer">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center shadow-lg">
+            <Briefcase className="text-black" size={18} />
           </div>
-          <span className="font-display text-xl font-800 text-white">
+          <span className="text-xl font-bold text-white">
             Job<span className="text-accent">Connect</span>
           </span>
         </div>
 
+        {/* Search (Desktop) */}
+        <div className="hidden lg:flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-80 backdrop-blur-xl">
+          <Search size={16} className="text-white/40 mr-2" />
+          <input
+            placeholder="Search jobs..."
+            className="bg-transparent outline-none text-sm w-full placeholder:text-white/40"
+          />
+        </div>
+
         {/* Desktop Nav */}
-        <nav className="hidden items-center gap-6 md:flex">
-          {["Find Jobs", "Companies", "Salaries", "Career Advice"].map((item) => (
+        <nav className="hidden md:flex items-center gap-6 text-sm">
+          {["Jobs", "Companies", "Salaries", "Resources"].map((item) => (
             <a
               key={item}
+              className="text-white/70 hover:text-white relative group"
               href="#"
-              className="text-sm font-medium text-white/70 transition-colors hover:text-white"
             >
               {item}
+              <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-accent transition-all group-hover:w-full" />
             </a>
           ))}
         </nav>
 
-        {/* Desktop Actions */}
-        <div className="hidden items-center gap-3 md:flex">
-          <button className="flex h-9 w-9 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white">
-            <Bell className="h-5 w-5" />
+        {/* Right Side */}
+        <div className="flex items-center gap-3">
+          {/* Notifications */}
+          <button className="hidden md:flex w-9 h-9 items-center justify-center rounded-full bg-white/5 hover:bg-white/10">
+            <Bell size={18} className="text-white/70" />
           </button>
-          <a href="#" className="btn-outline border-white/20 text-sm text-white hover:border-accent hover:text-accent">
-            Sign In
-          </a>
-          <a href="#" className="btn-cta text-sm">
-            Post a Job
-          </a>
-        </div>
 
-        {/* Mobile Toggle */}
-        <button
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-white md:hidden"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </button>
+          {/* Profile */}
+          <div className="relative hidden md:block">
+            <button
+              onClick={() => setProfileOpen(!profileOpen)}
+              className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full hover:bg-white/10"
+            >
+              <User size={16} />
+              <ChevronDown size={14} />
+            </button>
+
+            {profileOpen && (
+              <div className="absolute right-0 mt-2 w-44 bg-black/90 border border-white/10 backdrop-blur-xl rounded-xl p-2 shadow-xl">
+                {["Profile", "Saved Jobs", "Settings", "Logout"].map((i) => (
+                  <button
+                    key={i}
+                    className="block w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded-lg"
+                  >
+                    {i}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* CTA */}
+          <button className="hidden md:block px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:scale-105 transition">
+            Post Job
+          </button>
+
+          {/* Mobile Toggle */}
+          <button
+            className="md:hidden w-9 h-9 flex items-center justify-center"
+            onClick={() => setOpen(!open)}
+          >
+            {open ? <X /> : <Menu />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* Mobile Drawer */}
       {open && (
-        <div className="border-t border-white/10 bg-primary/98 px-4 pb-4 md:hidden">
-          {["Find Jobs", "Companies", "Salaries", "Career Advice"].map((item) => (
-            <a key={item} href="#" className="block py-3 text-sm font-medium text-white/70 hover:text-white">
-              {item}
-            </a>
-          ))}
-          <div className="mt-3 flex flex-col gap-2">
-            <a href="#" className="btn-outline w-full justify-center border-white/20 text-white">Sign In</a>
-            <a href="#" className="btn-cta w-full justify-center">Post a Job</a>
+        <div className="md:hidden bg-black/95 border-t border-white/10 backdrop-blur-xl">
+          <div className="p-4 space-y-3">
+            {["Jobs", "Companies", "Salaries", "Resources"].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="block text-white/70 hover:text-white"
+              >
+                {item}
+              </a>
+            ))}
+
+            <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+              <button className="w-full py-2 rounded-lg bg-white/10">
+                Sign In
+              </button>
+              <button className="w-full py-2 rounded-lg bg-accent text-black font-semibold">
+                Post Job
+              </button>
+            </div>
           </div>
         </div>
       )}
-    </header>
+    </motion.header>
   );
-};
-
-export default Navbar;
+}

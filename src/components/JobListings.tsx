@@ -1,141 +1,162 @@
-import { useState } from "react";
-import { MapPin, Clock, DollarSign, Bookmark, Star } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { MapPin, Clock, DollarSign, Bookmark, Star, Zap } from "lucide-react";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { JOBS } from "@/data/jobs";
 
-const FILTERS = ["All Jobs", "Full-time", "Part-time", "Remote", "Contract", "Internship"];
+const FILTERS = ["All Jobs", "Full-time", "Remote", "Part-time", "Contract"];
 
-const typeColor: Record<string, string> = {
-  "Full-time": "job-tag-navy",
-  "Remote":    "job-tag",
-  "Part-time": "job-tag-orange",
-  "Contract":  "job-tag-orange",
-};
-
-const JobListings = () => {
+export default function JobListings() {
   const [activeFilter, setActiveFilter] = useState("All Jobs");
-  const [saved, setSaved] = useState<number[]>([]);
+  const [saved, setSaved] = useState([]);
 
-  const toggleSave = (id: number) =>
+  // Load saved jobs
+  useEffect(() => {
+    const stored = localStorage.getItem("savedJobs");
+    if (stored) setSaved(JSON.parse(stored));
+  }, []);
+
+  // Persist saved jobs
+  useEffect(() => {
+    localStorage.setItem("savedJobs", JSON.stringify(saved));
+  }, [saved]);
+
+  const toggleSave = (id) =>
     setSaved((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
 
-  const filtered = JOBS.filter(
-    (j) => activeFilter === "All Jobs" || j.type === activeFilter
-  );
+  const filteredJobs = useMemo(() => {
+    return JOBS.filter(
+      (j) => activeFilter === "All Jobs" || j.type === activeFilter
+    );
+  }, [activeFilter]);
 
   return (
-    <section className="section-alt">
-      <div className="container mx-auto">
+    <section className="relative py-16 bg-black text-white">
+      <div className="container mx-auto px-4">
         {/* Header */}
-        <div className="mb-10 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
           <div>
-            <p className="mb-1 text-sm font-semibold uppercase tracking-widest text-accent">Latest Openings</p>
-            <h2 className="font-display text-3xl font-800 text-foreground md:text-4xl">
-              Featured Jobs
-            </h2>
+            <p className="text-accent text-sm uppercase font-semibold tracking-widest">
+              Latest Openings
+            </p>
+            <h2 className="text-4xl font-bold mt-2">Featured Jobs</h2>
           </div>
-          <a href="#" className="btn-outline text-sm">View All Jobs →</a>
+          <button className="px-5 py-2 rounded-full bg-white/10 hover:bg-white/20 transition">
+            View All →
+          </button>
         </div>
 
-        {/* Filter Pills */}
-        <div className="mb-8 flex flex-wrap gap-2">
+        {/* Filters */}
+        <div className="flex flex-wrap gap-2 mb-8">
           {FILTERS.map((f) => (
             <button
               key={f}
               onClick={() => setActiveFilter(f)}
-              className={`rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+              className={`px-4 py-2 rounded-full text-sm transition ${
                 activeFilter === f
-                  ? "text-accent-foreground shadow-glow"
-                  : "border border-border bg-card text-muted-foreground hover:border-accent/40 hover:text-accent"
+                  ? "bg-accent text-black font-semibold"
+                  : "bg-white/5 border border-white/10 hover:border-white/30"
               }`}
-              style={activeFilter === f ? { background: "var(--gradient-cta)" } : {}}
             >
               {f}
             </button>
           ))}
         </div>
 
-        {/* Job Cards Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((job) => (
-            <div
+        {/* Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredJobs.map((job, i) => (
+            <motion.div
               key={job.id}
-              className={`job-card relative flex flex-col gap-4 ${job.featured ? "ring-1 ring-accent/30" : ""}`}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="relative bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:bg-white/10 transition group"
             >
               {/* Featured badge */}
               {job.featured && (
-                <span className="absolute -top-2.5 right-4 rounded-full bg-accent px-3 py-0.5 text-xs font-semibold text-accent-foreground">
-                  Featured
+                <span className="absolute top-3 right-3 flex items-center gap-1 text-[10px] bg-accent text-black px-2 py-1 rounded-full">
+                  <Zap size={10} /> Featured
                 </span>
               )}
 
-              {/* Top row */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
+              {/* Top */}
+              <div className="flex justify-between">
+                <div className="flex gap-3">
                   <div
-                    className="flex h-12 w-12 items-center justify-center rounded-xl text-lg font-bold text-white shadow-sm"
-                    style={{ backgroundColor: job.logoColor }}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold shadow-lg"
+                    style={{ background: job.logoColor }}
                   >
                     {job.logo}
                   </div>
                   <div>
-                    <p className="font-semibold text-foreground">{job.company}</p>
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <p className="font-semibold">{job.company}</p>
+                    <div className="flex items-center gap-1 text-xs text-white/50">
+                      <Star size={12} className="text-yellow-400 fill-yellow-400" />
                       {job.rating}
                     </div>
                   </div>
                 </div>
+
                 <button
                   onClick={() => toggleSave(job.id)}
-                  className={`rounded-lg p-2 transition-all ${
-                    saved.includes(job.id) ? "text-accent" : "text-muted-foreground hover:text-accent"
-                  }`}
+                  className="text-white/50 hover:text-accent transition"
                 >
-                  <Bookmark className={`h-5 w-5 ${saved.includes(job.id) ? "fill-accent" : ""}`} />
+                  <Bookmark
+                    size={18}
+                    className={saved.includes(job.id) ? "fill-accent text-accent" : ""}
+                  />
                 </button>
               </div>
 
               {/* Title */}
-              <Link to={`/jobs/${job.id}`} className="group">
-                <h3 className="font-display text-lg font-700 text-foreground leading-snug group-hover:text-accent transition-colors">
+              <Link to={`/jobs/${job.id}`}>
+                <h3 className="mt-4 font-semibold text-lg group-hover:text-accent transition">
                   {job.title}
                 </h3>
               </Link>
 
               {/* Meta */}
-              <div className="flex flex-wrap gap-3 text-sm text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5" /> {job.location}
+              <div className="flex flex-wrap gap-4 text-xs text-white/50 mt-3">
+                <span className="flex items-center gap-1">
+                  <MapPin size={14} /> {job.location}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <DollarSign className="h-3.5 w-3.5" /> {job.salary}
+                <span className="flex items-center gap-1">
+                  <DollarSign size={14} /> {job.salary}
                 </span>
               </div>
 
               {/* Tags */}
-              <div className="flex flex-wrap gap-1.5">
-                <span className={typeColor[job.type] || "job-tag"}>{job.type}</span>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <span className="px-2 py-1 text-xs bg-accent/20 text-accent rounded-md">
+                  {job.type}
+                </span>
                 {job.tags.map((t) => (
-                  <span key={t} className="job-tag-navy">{t}</span>
+                  <span
+                    key={t}
+                    className="px-2 py-1 text-xs bg-white/10 rounded-md"
+                  >
+                    {t}
+                  </span>
                 ))}
               </div>
 
               {/* Footer */}
-              <div className="mt-auto flex items-center justify-between border-t border-border pt-3">
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Clock className="h-3.5 w-3.5" /> {job.posted}
+              <div className="flex justify-between items-center mt-5 pt-3 border-t border-white/10">
+                <span className="flex items-center gap-1 text-xs text-white/40">
+                  <Clock size={14} /> {job.posted}
                 </span>
-                <Link to={`/jobs/${job.id}`} className="btn-cta px-4 py-2 text-xs">
+                <Link
+                  to={`/jobs/${job.id}`}
+                  className="px-4 py-2 text-xs rounded-lg bg-accent text-black font-semibold hover:scale-105 transition"
+                >
                   Apply Now
                 </Link>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>
     </section>
   );
-};
-
-export default JobListings;
+}

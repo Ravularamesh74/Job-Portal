@@ -1,83 +1,170 @@
-import { Star, Users, Briefcase, Globe } from "lucide-react";
+import { Star, Users, Briefcase, Globe, Bookmark, TrendingUp } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState } from "react";
 
 const COMPANIES = [
-  { name: "Google",    letter: "G", color: "#4285F4", openRoles: 342, employees: "100K+", industry: "Technology",    rating: 4.8 },
-  { name: "Microsoft", letter: "M", color: "#00A4EF", openRoles: 218, employees: "220K+", industry: "Technology",    rating: 4.6 },
-  { name: "Amazon",    letter: "A", color: "#FF9900", openRoles: 587, employees: "1.5M+", industry: "E-Commerce",    rating: 4.3 },
-  { name: "Apple",     letter: "A", color: "#555555", openRoles: 195, employees: "160K+", industry: "Consumer Tech", rating: 4.7 },
-  { name: "Meta",      letter: "M", color: "#0866FF", openRoles: 264, employees: "70K+",  industry: "Social Media",  rating: 4.4 },
-  { name: "Netflix",   letter: "N", color: "#E50914", openRoles: 89,  employees: "12K+",  industry: "Streaming",    rating: 4.5 },
-  { name: "Salesforce",letter: "S", color: "#00A1E0", openRoles: 176, employees: "80K+",  industry: "SaaS",         rating: 4.4 },
-  { name: "Spotify",   letter: "S", color: "#1DB954", openRoles: 143, employees: "9K+",   industry: "Music Tech",   rating: 4.6 },
+  {
+    name: "Google",
+    color: "#4285F4",
+    industry: "AI & Cloud",
+    rating: 4.8,
+    openRoles: 342,
+    employees: "100K+",
+    skills: ["React", "AI", "Cloud", "Go"],
+    hot: true,
+  },
+  {
+    name: "Microsoft",
+    color: "#00A4EF",
+    industry: "Enterprise Tech",
+    rating: 4.6,
+    openRoles: 218,
+    employees: "220K+",
+    skills: ["Azure", "Node", "C#", "AI"],
+  },
+  {
+    name: "Amazon",
+    color: "#FF9900",
+    industry: "E-Commerce",
+    rating: 4.3,
+    openRoles: 587,
+    employees: "1.5M+",
+    skills: ["AWS", "Java", "React"],
+    hot: true,
+  },
+  {
+    name: "Netflix",
+    color: "#E50914",
+    industry: "Streaming",
+    rating: 4.5,
+    openRoles: 89,
+    employees: "12K+",
+    skills: ["Backend", "Data", "Scala"],
+  },
 ];
 
-const FeaturedCompanies = () => (
-  <section className="section">
-    <div className="container mx-auto">
-      <div className="mb-12 text-center">
-        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-accent">Top Employers</p>
-        <h2 className="font-display text-3xl font-800 text-foreground md:text-4xl">
-          Featured Companies
-        </h2>
-        <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-          Thousands of world-class employers trust JobConnect to find their next great hire.
-        </p>
-      </div>
+export default function FeaturedCompanies() {
+  const [saved, setSaved] = useState([]);
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {COMPANIES.map((c) => (
-          <div
-            key={c.name}
-            className="group cursor-pointer rounded-xl border border-border bg-card p-5 transition-all duration-300 hover:-translate-y-1"
-            style={{ boxShadow: "var(--shadow-card)" }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.boxShadow = "var(--shadow-card-hover)")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.boxShadow = "var(--shadow-card)")
-            }
-          >
-            {/* Logo + Rating */}
-            <div className="mb-4 flex items-center justify-between">
+  const toggleSave = (name) => {
+    setSaved((prev) =>
+      prev.includes(name) ? prev.filter((n) => n !== name) : [...prev, name]
+    );
+  };
+
+  return (
+    <section className="py-16 relative overflow-hidden">
+      <div className="container mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <p className="text-accent text-sm uppercase tracking-widest font-semibold">
+            Top Employers
+          </p>
+          <h2 className="text-4xl font-bold mt-2">Work With The Best</h2>
+          <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
+            Join companies shaping the future of technology and innovation.
+          </p>
+        </div>
+
+        {/* GRID */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {COMPANIES.map((c, i) => (
+            <motion.div
+              key={c.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="group relative rounded-2xl border bg-white/70 backdrop-blur-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500"
+            >
+              {/* Glow effect */}
               <div
-                className="flex h-12 w-12 items-center justify-center rounded-xl text-xl font-bold text-white shadow-sm"
-                style={{ backgroundColor: c.color }}
-              >
-                {c.letter}
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition rounded-2xl blur-xl"
+                style={{ background: `${c.color}30` }}
+              />
+
+              {/* Top */}
+              <div className="flex justify-between items-start relative z-10">
+                <div
+                  className="h-12 w-12 rounded-xl flex items-center justify-center text-white font-bold"
+                  style={{ background: c.color }}
+                >
+                  {c.name[0]}
+                </div>
+
+                <button
+                  onClick={() => toggleSave(c.name)}
+                  className={`transition ${
+                    saved.includes(c.name)
+                      ? "text-yellow-500"
+                      : "text-muted-foreground"
+                  }`}
+                >
+                  <Bookmark size={18} />
+                </button>
               </div>
-              <div className="flex items-center gap-1 text-sm font-medium">
-                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                {c.rating}
+
+              {/* HOT BADGE */}
+              {c.hot && (
+                <span className="absolute top-4 left-4 flex items-center gap-1 text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+                  <TrendingUp size={12} /> Hiring Fast
+                </span>
+              )}
+
+              {/* NAME */}
+              <h3 className="text-lg font-bold mt-4">{c.name}</h3>
+              <p className="text-sm text-muted-foreground">{c.industry}</p>
+
+              {/* Rating */}
+              <div className="flex items-center gap-2 mt-3">
+                <Star className="text-yellow-400 fill-yellow-400" size={16} />
+                <span className="font-medium">{c.rating}</span>
+
+                {/* Progress bar */}
+                <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-yellow-400"
+                    style={{ width: `${c.rating * 20}%` }}
+                  />
+                </div>
               </div>
-            </div>
 
-            <h3 className="font-display text-lg font-700 text-foreground">{c.name}</h3>
-            <p className="mb-4 text-sm text-muted-foreground">{c.industry}</p>
+              {/* Skills */}
+              <div className="flex flex-wrap gap-1 mt-3">
+                {c.skills.map((s) => (
+                  <span
+                    key={s}
+                    className="text-xs bg-gray-100 px-2 py-1 rounded-md"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
 
-            {/* Stats */}
-            <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span className="flex items-center gap-1.5">
-                <Briefcase className="h-3.5 w-3.5" /> {c.openRoles} open roles
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Users className="h-3.5 w-3.5" /> {c.employees}
-              </span>
-            </div>
+              {/* Stats */}
+              <div className="flex justify-between text-xs text-muted-foreground mt-4">
+                <span className="flex items-center gap-1">
+                  <Briefcase size={14} /> {c.openRoles} jobs
+                </span>
+                <span className="flex items-center gap-1">
+                  <Users size={14} /> {c.employees}
+                </span>
+              </div>
 
-            <button className="btn-outline mt-4 w-full justify-center border-border text-sm group-hover:border-accent group-hover:text-accent">
-              View Jobs
-            </button>
-          </div>
-        ))}
+              {/* CTA */}
+              <button className="mt-5 w-full rounded-lg bg-black text-white py-2 text-sm hover:bg-accent transition">
+                View Open Roles
+              </button>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Bottom CTA */}
+        <div className="text-center mt-12">
+          <button className="inline-flex items-center gap-2 bg-accent text-white px-6 py-3 rounded-full shadow-lg hover:scale-105 transition">
+            <Globe size={16} /> Explore All Companies
+          </button>
+        </div>
       </div>
-
-      <div className="mt-8 text-center">
-        <a href="#" className="btn-primary inline-flex gap-2">
-          <Globe className="h-4 w-4" /> Explore All Companies
-        </a>
-      </div>
-    </div>
-  </section>
-);
-
-export default FeaturedCompanies;
+    </section>
+  );
+}

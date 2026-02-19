@@ -1,59 +1,113 @@
 import { CheckCircle, FileText, Send, ThumbsUp } from "lucide-react";
+import { motion } from "framer-motion";
 
 const STEPS = [
-  { icon: FileText,    step: "01", title: "Create Profile",        desc: "Build your professional profile with skills, experience, and portfolio in minutes." },
-  { icon: Send,        step: "02", title: "Discover Jobs",         desc: "Browse thousands of curated roles matched to your skills and preferences." },
-  { icon: CheckCircle, step: "03", title: "Apply with One Click",  desc: "Apply instantly to multiple positions with your saved profile and resume." },
-  { icon: ThumbsUp,    step: "04", title: "Get Hired",             desc: "Receive offers, negotiate salary, and land your dream role." },
+  {
+    icon: FileText,
+    title: "Create Your Profile",
+    desc: "Build a powerful profile with skills, experience, and portfolio in under 2 minutes.",
+  },
+  {
+    icon: Send,
+    title: "Discover Smart Matches",
+    desc: "Our AI matches you with jobs based on your skills, goals, and preferences.",
+  },
+  {
+    icon: CheckCircle,
+    title: "Apply Instantly",
+    desc: "One-click apply with saved resumes and smart autofill applications.",
+  },
+  {
+    icon: ThumbsUp,
+    title: "Get Hired Faster",
+    desc: "Receive interview calls, negotiate offers, and land your dream job.",
+  },
 ];
 
-const HowItWorks = () => (
-  <section className="section overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
-    <div className="container mx-auto">
-      <div className="mb-12 text-center">
-        <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-accent">Simple Process</p>
-        <h2 className="font-display text-3xl font-800 text-white md:text-4xl">
-          How JobConnect Works
-        </h2>
-        <p className="mx-auto mt-3 max-w-lg text-white/60">
-          Land your next opportunity in four easy steps. From profile to paycheck.
-        </p>
+export default function HowItWorks() {
+  return (
+    <section className="relative py-20 bg-black text-white overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,#00ffc320,transparent_30%),radial-gradient(circle_at_80%_80%,#7c3aed20,transparent_30%)]" />
+
+      <div className="relative z-10 container mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <p className="text-accent uppercase text-sm tracking-widest font-semibold">
+            How It Works
+          </p>
+          <h2 className="text-4xl md:text-5xl font-bold mt-3">
+            Get Hired in 4 Simple Steps
+          </h2>
+          <p className="text-white/60 mt-4 max-w-xl mx-auto">
+            A seamless journey from profile creation to landing your dream job.
+          </p>
+        </div>
+
+        {/* Timeline */}
+        <div className="relative max-w-5xl mx-auto">
+          {/* Vertical line */}
+          <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-white/10 hidden md:block" />
+
+          {STEPS.map((step, i) => {
+            const Icon = step.icon;
+            const isLeft = i % 2 === 0;
+
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: isLeft ? -80 : 80 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: i * 0.2 }}
+                className={`mb-12 flex flex-col md:flex-row items-center ${
+                  isLeft ? "md:flex-row-reverse" : ""
+                }`}
+              >
+                {/* Content */}
+                <div className="md:w-1/2 px-6">
+                  <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition group">
+                    <h3 className="text-xl font-semibold mb-2 group-hover:text-accent transition">
+                      {step.title}
+                    </h3>
+                    <p className="text-white/60 text-sm leading-relaxed">
+                      {step.desc}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Icon center */}
+                <div className="relative flex items-center justify-center md:w-0">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center shadow-lg z-10">
+                    <Icon className="text-white" size={22} />
+                  </div>
+
+                  {/* Step number */}
+                  <span className="absolute -bottom-6 text-xs text-white/40">
+                    Step {i + 1}
+                  </span>
+                </div>
+
+                {/* Spacer */}
+                <div className="md:w-1/2" />
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* CTA */}
+        <div className="text-center mt-16">
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 rounded-full bg-accent text-black font-semibold shadow-xl"
+          >
+            Start Your Journey →
+          </motion.button>
+          <p className="text-white/40 text-sm mt-3">
+            No signup fees • 100% free for job seekers
+          </p>
+        </div>
       </div>
-
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {STEPS.map(({ icon: Icon, step, title, desc }, i) => (
-          <div key={step} className="relative flex flex-col items-center text-center">
-            {/* Connector line */}
-            {i < STEPS.length - 1 && (
-              <div className="absolute left-[calc(50%+3rem)] top-8 hidden h-px w-[calc(100%-3rem)] border-t-2 border-dashed border-accent/30 lg:block" />
-            )}
-
-            {/* Icon circle */}
-            <div
-              className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-2xl animate-pulse-glow"
-              style={{ background: "var(--gradient-cta)" }}
-            >
-              <Icon className="h-7 w-7 text-white" />
-              <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-accent ring-2 ring-accent/40">
-                {i + 1}
-              </span>
-            </div>
-
-            <h3 className="font-display mb-2 text-lg font-700 text-white">{title}</h3>
-            <p className="text-sm text-white/50 leading-relaxed">{desc}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* CTA */}
-      <div className="mt-14 text-center">
-        <a href="#" className="btn-cta px-10 py-4 text-base">
-          Get Started Free →
-        </a>
-        <p className="mt-3 text-sm text-white/40">No credit card required</p>
-      </div>
-    </div>
-  </section>
-);
-
-export default HowItWorks;
+    </section>
+  );
+}
