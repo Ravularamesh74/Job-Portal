@@ -9,11 +9,21 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    setProfileOpen(false);
+    navigate("/");
+  };
 
   // Scroll shadow effect
   useEffect(() => {
@@ -26,22 +36,21 @@ export default function Navbar() {
     <motion.header
       initial={{ y: -80 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all ${
-        scrolled
-          ? "bg-black/80 backdrop-blur-xl shadow-lg border-b border-white/10"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all ${scrolled
+        ? "bg-black/80 backdrop-blur-xl shadow-lg border-b border-white/10"
+        : "bg-transparent"
+        }`}
     >
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div className="flex items-center gap-2 cursor-pointer">
+        <Link to="/" className="flex items-center gap-2 cursor-pointer">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent to-purple-500 flex items-center justify-center shadow-lg">
             <Briefcase className="text-black" size={18} />
           </div>
           <span className="text-xl font-bold text-white">
             Job<span className="text-accent">Connect</span>
           </span>
-        </div>
+        </Link>
 
         {/* Search (Desktop) */}
         <div className="hidden lg:flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2 w-80 backdrop-blur-xl">
@@ -73,34 +82,61 @@ export default function Navbar() {
             <Bell size={18} className="text-white/70" />
           </button>
 
-          {/* Profile */}
-          <div className="relative hidden md:block">
-            <button
-              onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full hover:bg-white/10"
-            >
-              <User size={16} />
-              <ChevronDown size={14} />
-            </button>
+          {/* Profile / Auth */}
+          {user ? (
+            <div className="relative hidden md:block">
+              <button
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="flex items-center gap-2 bg-white/5 px-3 py-1.5 rounded-full hover:bg-white/10"
+              >
+                <div className="w-6 h-6 rounded-full bg-accent text-black flex items-center justify-center text-[10px] font-bold">
+                  {user.name.charAt(0)}
+                </div>
+                <ChevronDown size={14} />
+              </button>
 
-            {profileOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-black/90 border border-white/10 backdrop-blur-xl rounded-xl p-2 shadow-xl">
-                {["Profile", "Saved Jobs", "Settings", "Logout"].map((i) => (
+              {profileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-black/90 border border-white/10 backdrop-blur-xl rounded-xl p-2 shadow-xl">
+                  {[
+                    { label: "Profile", path: "/profile" },
+                    { label: "Saved Jobs", path: "/saved-jobs" },
+                    { label: "Settings", path: "/settings" },
+                  ].map((item) => (
+                    <Link
+                      key={item.label}
+                      to={item.path}
+                      onClick={() => setProfileOpen(false)}
+                      className="block w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded-lg"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                  <div className="h-px bg-white/10 my-1 mx-2" />
                   <button
-                    key={i}
-                    className="block w-full text-left px-3 py-2 text-sm hover:bg-white/10 rounded-lg"
+                    onClick={handleLogout}
+                    className="block w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-400/10 rounded-lg"
                   >
-                    {i}
+                    Logout
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/login"
+              className="hidden md:block px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-semibold transition"
+            >
+              Sign In
+            </Link>
+          )}
 
           {/* CTA */}
-          <button className="hidden md:block px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:scale-105 transition">
+          <Link
+            to="/post-job"
+            className="hidden md:block px-4 py-2 rounded-lg bg-accent text-black font-semibold hover:scale-105 transition text-center"
+          >
             Post Job
-          </button>
+          </Link>
 
           {/* Mobile Toggle */}
           <button
@@ -127,12 +163,38 @@ export default function Navbar() {
             ))}
 
             <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
-              <button className="w-full py-2 rounded-lg bg-white/10">
-                Sign In
-              </button>
-              <button className="w-full py-2 rounded-lg bg-accent text-black font-semibold">
+              {user ? (
+                <>
+                  <Link
+                    to="/profile"
+                    onClick={() => setOpen(false)}
+                    className="w-full py-2.5 rounded-lg bg-white/10 text-center text-sm"
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full py-2.5 rounded-lg bg-red-400/10 text-red-400 text-sm"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setOpen(false)}
+                  className="w-full py-2.5 rounded-lg bg-white/10 text-center text-sm"
+                >
+                  Sign In
+                </Link>
+              )}
+              <Link
+                to="/post-job"
+                onClick={() => setOpen(false)}
+                className="w-full py-2 rounded-lg bg-accent text-black font-semibold text-center"
+              >
                 Post Job
-              </button>
+              </Link>
             </div>
           </div>
         </div>
